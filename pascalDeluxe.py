@@ -252,7 +252,8 @@ class MyLexer(Lexer):
 			   'LBRACKET', 'RBRACKET', 'COMMA',
 			   'HEAD', 'TAIL', 'SORT',
 			   'AND_OP', 'OR_OP', 'NOT_OP',
-			   'MOD_OP', 'EXP_OP' }
+			   'MOD_OP', 'EXP_OP',
+			   'LBRACE', 'RBRACE' }
 
 	# String containing ignored characters
 	ignore = ' \t'
@@ -273,6 +274,9 @@ class MyLexer(Lexer):
 	LBRACKET	= r'\['
 	RBRACKET	= r'\]'
 	COMMA	= r','
+	LBRACE = r'\{'
+	RBRACE = r'\}'
+
 
 	@_(r'&&|and')
 	def AND_OP(self, t):
@@ -347,6 +351,19 @@ class MyParser(Parser):
 	)
 
 	# Grammar rules and actions
+	@_('LBRACE statements RBRACE')
+	def statement(self, p):
+		for st in p.statements:
+			pass
+		
+	@_('statement statements')
+	def statements(self, p):
+		return [p.statement] + p.statements
+		
+	@_('')
+	def statements(self, p):
+		return []
+
 	@_('ID ASSIGN expr_list')
 	def statement(self, p):
 		printGreen(f'Rule: statement => ID ASSIGN expr_list ({p.ID}, {repr(p.expr_list)})')
